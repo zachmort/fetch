@@ -13,6 +13,8 @@ for file_name, df in named_dfs.items():
     print(f"Loaded {file_name} into SQL table '{table_name}'")
 
 # Query to find the top 5 brands by receipts scanned among users 21 and over
+# Looking for count of receipts scanned
+# Assuming we dont want brands with null values
 top5_receipts_query = """
         SELECT 
             p.brand
@@ -34,16 +36,18 @@ top_brands = pd.read_sql_query(top5_receipts_query, conn)
 
 
 # Query to find the top 5 brands by sales among users that have had their account for at least six months
+# Assuming we dont want brands with null values
 top5_brands_query = """
         SELECT 
             p.brand
             , SUM(CAST(t.final_sale AS FLOAT)) AS total_sales
+            , SUM(CAST(t.final_quantity AS FLOAT)) AS total_items_sold
         FROM transaction_takehome t
         JOIN user_takehome u 
             ON t.user_id = u.id
         JOIN products_takehome p 
             ON t.barcode = p.barcode
-        WHERE u.created_date <= date('now', '-180 days')
+        WHERE u.created_date >= date(u.created_date, '-180 days')
             AND p.brand IS NOT NULL
         GROUP BY p.brand
         ORDER BY total_sales DESC
@@ -76,6 +80,8 @@ explore_query = """
 explore = pd.read_sql_query(explore_query, conn)
 
 # Query to determine the leading brand in the "Dips & Salsa" category
+# How does 1 define leading brand? Is it the brand with the most sales, the most receipts scanned, or something else?
+# From Fetch's perspective, leading brand could be a brand with the most individual receipts scanned as this would provide data for more than just items purchased but woul also provide frequency of shopping, consumer habits, complimentary goods purchased etc.
 leading_brand_query = """
         SELECT 
             CASE WHEN p.brand IS NULL THEN 'Unknown' ELSE p.brand END AS brand

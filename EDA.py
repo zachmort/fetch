@@ -1,8 +1,5 @@
 ### Findings ###
 # Are there any data quality issues present?
-# - Missing data in the 'PRODUCTS_TAKEHOME.csv' dataset.
-# - Duplicate rows in the 'TRANSACTION_TAKEHOME.csv' dataset.
-# - Missing product and user IDs in the 'TRANSACTION_TAKEHOME.csv' dataset.
 # In products csv the manufacturer column has missing values but also has values for "placeholder manufacturer" which could be confusing as if the manufacturer is truly unknown all values should have the place holder or be NULL/Nan.
 # In products csv the brand column has missing values but also has values for "unknown brand" which could be confusing as if the brand is truly unknown all values should have the place holder or be NULL/Nan.
 # Not necessary but any primary/forgien keys could be moved towards the font of the datasets for easier reference
@@ -19,11 +16,12 @@
 # Extreme values of birthdate in users csv (1901) and (2015) which could be errors or during the user sign up process restrictions were not put in place for a min/max age
 # barcode contains -1 values in products csv which could be an error or a placeholder value (maybe engineering test cases)
 # Manufacturer contains suffixes like llc, inc, co, etc. which could be removed for consistency
+# category columns contain special characters (e.g. /, &) which could be removed for consistency
 
 # Are there any fields that are challenging to understand?
-# - The 'final_sale' column in the 'TRANSACTION_TAKEHOME.csv' dataset is not clear. Final quantity shows "zero" for quantity but final sale has positive dollar amounts
-# - The 'category_1', 'category_2', and 'category_3' columns in the 'PRODUCTS_TAKEHOME.csv' dataset are not self-explanatory.
-# - The 'created_date' column in the 'USER_TAKEHOME.csv' dataset is not clear.
+# The 'final_sale' column in the 'TRANSACTION_TAKEHOME.csv' dataset is not clear. Final quantity shows "zero" for quantity but final sale has positive dollar amounts
+# The 'category_1', 'category_2', and 'category_3' columns in the 'PRODUCTS_TAKEHOME.csv' dataset are not self-explanatory.
+# The 'created_date' column in the 'USER_TAKEHOME.csv' dataset is not clear.
 # Receipt id contains dupes in transactions csv, generally these should be unique but have differing final_quantity and final_sale values
 # Language in the datasets is not consistent, for example in the products csv the manufacturer column has missing values but also has values for "placeholder manufacturer" which could be confusing as if the manufacturer is truly unknown all values should have the place holder or be NULL/Nan.
 # language for the user contains values "en" but also "es-419" so it is difficult to understand what the "-419" means and why a suffix is not also on "en" values
@@ -31,6 +29,8 @@
 # Final quantity contains decimal values which seems unlikely for a quantity of a product
 # The category granularity is not clear, for example in the products csv the category_1, category_2, and category_3 columns in the 'PRODUCTS_TAKEHOME.csv' dataset are not self-explanatory
 # Is state in User csv the state of the user or the state of the store they shop at? This could be confusing if the data is not intended to be the state of the user
+# (Confusing as well as data quality issue) In products csv the manufacturer column has missing values but also has values for "placeholder manufacturer" which could be confusing as if the manufacturer is truly unknown all values should have the place holder or be NULL/Nan.
+# (Confusing as well as data quality issue) In products csv the brand column has missing values but also has values for "unknown brand" which could be confusing as if the brand is truly unknown all values should have the place holder or be NULL/Nan.
 
 
 
@@ -130,34 +130,6 @@ def check_missing_values(dfs: dict[str,pd.DataFrame]) -> Dict[str, pd.Series]:
     return missing_values
 
 
-# Only run the following code if the script is executed directly
-if __name__ == "__main__":
-    transactions_df: pd.DataFrame | None = named_dfs.get("TRANSACTION_TAKEHOME.csv")
-    products_df: pd.DataFrame | None = named_dfs.get("PRODUCTS_TAKEHOME.csv")
-    users_df: pd.DataFrame | None = named_dfs.get("USER_TAKEHOME.csv")
-
-    # Check if datasets exist before proceeding (to avoid errors)
-    if transactions_df is not None or products_df is not None or users_df is not None:
-        key_integrity_issues: Dict[str, int] | str = check_key_integrity(transactions_df, products_df, users_df)
-    else:
-        key_integrity_issues = "Missing required datasets."
-
-    print("\n checking for missing values")
-    missing_values = check_missing_values(named_dfs)
-    print("\n checking for duplicates")
-    duplicate_counts: Dict[str, int] = check_duplicates(named_dfs)
-    print("\n checking for data types")
-    data_types = check_data_types(named_dfs)
-
-    print(
-        {
-        "missing_values": missing_values,
-        "duplicate_counts": duplicate_counts,
-        "data_types": data_types,
-        "key_integrity_issues": key_integrity_issues,
-    }
-    )
-
 # Function to visualize CSV data
 def visualize_csv_data(csv_files: dict) -> None:
     """
@@ -195,9 +167,38 @@ def visualize_csv_data(csv_files: dict) -> None:
 
         print(f"Finished visualizing {file_name}\n")
 
-# # Call the function with the datasets
-visualize_csv_data({
-    "PRODUCTS_TAKEHOME.csv": products_df,
-    "TRANSACTION_TAKEHOME.csv": transactions_df,
-    "USER_TAKEHOME.csv": users_df,
-})
+
+# Only run the following code if the script is executed directly
+if __name__ == "__main__":
+    transactions_df: pd.DataFrame | None = named_dfs.get("TRANSACTION_TAKEHOME.csv")
+    products_df: pd.DataFrame | None = named_dfs.get("PRODUCTS_TAKEHOME.csv")
+    users_df: pd.DataFrame | None = named_dfs.get("USER_TAKEHOME.csv")
+
+    # Check if datasets exist before proceeding (to avoid errors)
+    if transactions_df is not None or products_df is not None or users_df is not None:
+        key_integrity_issues: Dict[str, int] | str = check_key_integrity(transactions_df, products_df, users_df)
+    else:
+        key_integrity_issues = "Missing required datasets."
+
+    print("\n checking for missing values")
+    missing_values = check_missing_values(named_dfs)
+    print("\n checking for duplicates")
+    duplicate_counts: Dict[str, int] = check_duplicates(named_dfs)
+    print("\n checking for data types")
+    data_types = check_data_types(named_dfs)
+
+    print(
+        {
+        "missing_values": missing_values,
+        "duplicate_counts": duplicate_counts,
+        "data_types": data_types,
+        "key_integrity_issues": key_integrity_issues,
+    }
+    )
+
+    # # Call the viz function with the datasets
+    visualize_csv_data({
+        "PRODUCTS_TAKEHOME.csv": products_df,
+        "TRANSACTION_TAKEHOME.csv": transactions_df,
+        "USER_TAKEHOME.csv": users_df,
+    })
