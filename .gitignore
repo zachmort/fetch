@@ -2,3 +2,5 @@
 PRODUCTS_TAKEHOME.csv
 USER_TAKEHOME.csv
 TRANSACTION_TAKEHOME.csv
+tmp/*
+__pycache__/*
