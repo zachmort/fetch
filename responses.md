@@ -41,7 +41,10 @@
 ### The SQL queries can be found with the assumptions, notes and EDA in the SQLExplore.py file
 
 ### Answer to the question: The top 5 brands by distinct receipts scanned among users 21 and over are:
-### These counts reflect distinct receipts and exclude any brands with NULL values, aligning with the assumption that “brand” refers to the product’s brand rather than the store’s.
+#### Assumptions:
+- Looking for count of receipts scanned (There is duplicates in the data so we are counting distinct receipts)
+- Assuming we dont want brands with null values
+- Assuming brand is referring to the brand of the product not store brand
 
 1. NERDS CANDY (3 receipts)
 2. DOVE (3 receipts)
@@ -51,6 +54,12 @@
 
 
 ### Answer to the question: The top 5 brands by total sales among users with accounts older than six months are:
+#### Assumptions:
+- Assuming we dont want brands with null values.
+- Assuming we dont want receipts with NULL values.
+- Assuming final_sale means the final price of the order rather than the price of the item.
+- Assuming quantity cant be a decimal so rounding all decimals down to 0th place.
+- Assuming we want to remove "duplicate" receipts (receipts with the same items) and take the max or the sales prices and quantities.
 1. CVS (USD 72.00 total sales, 1 item sold)
 2. DOVE (USD 30.91 total sales, 3 items sold)
 3. TRIDENT (USD 23.36 total sales, 2 items sold)
@@ -59,6 +68,9 @@
 
 
 ### Answer to the question: Which is the leading brand in the Dips & Salsa category?
+#### Assumptions:
+- Assuming "Dips & Salsa" is a the subcategory we want and not just a all encompassing category that would include other items (like bean dip, cheese dip etc)
+- How does 1 define leading brand? Is it the brand with the most sales, the most receipts scanned, most unique users, most consistent purchases (ie users constantly come back to the brand rather than just a large influx in 1 month while while other months struggle) or something else? From Fetch's perspective, leading brand could be a brand with the most individual receipts scanned as this would provide data for more than just items purchased but would also provide frequency of shopping, consumer habits, complimentary goods purchased etc.
 1. TOSTITOS – 36 distinct sales
 2. PACE – 24 distinct sales
 3. FRITOS – 19 distinct sales
